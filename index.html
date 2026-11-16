@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Smoke &amp; CO Alarm Expiry Planner — Log Every Alarm in Your House</title>
 <meta name="description" content="Free household log for every smoke, carbon monoxide and combo alarm in your home. Enter the manufacture date from the back of each alarm, see replace-by dates, print a sheet, and download calendar reminders.">
-<link rel="canonical" href="https://smoke-co-alarm-planner.vercel.app/">
+<link rel="canonical" href="https://live-city-life-anywhere.vercel.app/safety/">
 <meta property="og:title" content="Smoke & CO Alarm Expiry Planner">
 <meta property="og:description" content="Log every smoke and CO alarm in your house, see which ones are expired, and get calendar reminders for replace-by dates.">
 <meta property="og:type" content="website">
@@ -159,9 +159,18 @@ footer p{margin:.3rem 0}
   .testlog td:first-child,.testlog th:first-child{text-align:left;width:26%}
   a{color:#000;text-decoration:none}
 }
+
+.hubbar{background:#fdf0d2;border-bottom:1px solid #efd9a6;color:#6b4400;font-size:1rem;padding:12px 0;position:relative;z-index:2}
+.hubbar .wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+.hubbar a{color:#1e357f;font-weight:700}
+.hubbar a:hover{color:#2c4bb5}
+@media print{.hubbar{display:none!important}}
 </style>
 </head>
 <body>
+<div class="hubbar"><div class="wrap">
+<p style="margin:0"><strong>Part of <a href="https://live-city-life-anywhere.vercel.app/safety/">Live City Life, Anywhere — Safety</a>.</strong> This planner also lives on the hub, next to a winter prep checklist and the rest of the off-grid toolkit.</p>
+</div></div>
 <header class="masthead">
   <div class="wrap">
     <div class="brandline">Household Safety Log</div>
@@ -335,6 +344,7 @@ footer p{margin:.3rem 0}
     <p>Test every alarm monthly with its test button. Replace any alarm that fails its test, keeps chirping after a fresh battery, or whose age you can't confirm.</p>
     <p>As an Amazon Associate I earn from qualifying purchases. Brand names are trademarks of their owners; this site is not affiliated with Kidde, First Alert, or NFPA.</p>
     <p>Your alarm list is stored only in this browser's localStorage.</p>
+    <p class="no-print">Part of <a href="https://live-city-life-anywhere.vercel.app/safety/">Live City Life, Anywhere — Safety</a>. Use the same planner on the hub, plus the winter prep checklist.</p>
   </div>
 </footer>
 
@@ -565,5 +575,7 @@ $('clear-btn').addEventListener('click',function(){if(list.length&&confirm('Clea
 syncMode(); render();
 })();
 </script>
+<script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+<script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
