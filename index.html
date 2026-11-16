@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Smoke &amp; CO Alarm Expiry Planner — Log Every Alarm in Your House</title>
+<meta name="description" content="Free household log for every smoke, carbon monoxide and combo alarm in your home. Enter the manufacture date from the back of each alarm, see replace-by dates, print a sheet, and download calendar reminders.">
+<link rel="canonical" href="https://smoke-co-alarm-planner.vercel.app/">
+<meta property="og:title" content="Smoke & CO Alarm Expiry Planner">
+<meta property="og:description" content="Log every smoke and CO alarm in your house, see which ones are expired, and get calendar reminders for replace-by dates.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://smoke-co-alarm-planner.vercel.app/">
+<meta name="theme-color" content="#1d3557">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231d3557'/%3E%3Ccircle cx='16' cy='16' r='9' fill='%23f7f6f1'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%239f1239'/%3E%3C/svg%3E">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"Smoke & CO Alarm Expiry Planner","url":"https://smoke-co-alarm-planner.vercel.app/","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+</script>
+<style>
+:root{
+  --paper:#f7f6f1; --sheet:#fffefa; --ink:#1f2420; --ink-soft:#4a4f4a; --rule:#dcd8cc; --rule-blue:#c9d4e3;
+  --navy:#1d3557; --navy-soft:#e6ebf2; --crimson:#9f1239; --crimson-soft:#fbe9ee;
+  --mustard:#8a6a00; --mustard-soft:#fbf3d6; --ok:#1d3557; --ok-soft:#e6ebf2;
+  --head:"Palatino Linotype",Palatino,"Book Antiqua","URW Palladio L",serif;
+  --body:"Franklin Gothic Book","Libre Franklin","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --radius:4px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5;overflow-x:hidden}
+h1,h2,h3{font-family:var(--head);font-weight:700;line-height:1.2;color:var(--navy);margin:0 0 .5rem}
+h1{font-size:1.85rem}
+h2{font-size:1.4rem}
+h3{font-size:1.1rem}
+a{color:var(--navy)}
+p{margin:.4rem 0 .8rem}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+/* header strip */
+.masthead{background:var(--navy);color:#fff;padding:14px 0 0}
+.masthead .wrap{display:flex;flex-direction:column;gap:6px}
+.brandline{font-family:var(--head);font-size:.95rem;letter-spacing:.08em;text-transform:uppercase;opacity:.85}
+.masthead h1{color:#fff;margin:0}
+.masthead p{margin:0 0 10px;color:#dfe6f0;max-width:46rem}
+.disclosure{background:#fff;border:1px solid var(--rule);border-left:4px solid var(--crimson);padding:8px 12px;font-size:.9rem;margin:12px 0 0}
+/* binder tabs */
+.tabs{display:flex;gap:4px;overflow-x:auto;margin-top:6px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs a{flex:0 0 auto;background:#2b4a72;color:#fff;text-decoration:none;padding:10px 14px;border-radius:8px 8px 0 0;font-size:.9rem;min-height:44px;display:flex;align-items:center}
+.tabs a:first-child{background:var(--paper);color:var(--navy);font-weight:700}
+/* binder sheet */
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:var(--radius);padding:18px 16px;margin:18px 0;position:relative;box-shadow:0 1px 0 rgba(0,0,0,.04)}
+@media(min-width:760px){
+  .sheet{padding:24px 28px 24px 64px}
+  .sheet::before{content:"";position:absolute;left:22px;top:28px;bottom:28px;width:14px;
+    background:radial-gradient(circle at 7px 7px,var(--paper) 6px,#cfcabd 6.5px,transparent 7.5px) 0 0/14px 120px repeat-y}
+  .sheet::after{content:"";position:absolute;left:48px;top:0;bottom:0;border-left:2px solid #e8b9c5}
+}
+.sheet-label{font-family:var(--head);font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--crimson);margin-bottom:2px}
+/* form */
+form.entry{display:grid;gap:12px;grid-template-columns:1fr}
+@media(min-width:760px){form.entry{grid-template-columns:repeat(6,1fr)}
+  .f-room{grid-column:span 2}.f-type{grid-column:span 2}.f-brand{grid-column:span 2}
+  .f-mode{grid-column:span 6}.f-date{grid-column:span 3}.f-life{grid-column:span 3}.f-actions{grid-column:span 6}}
+label{display:block;font-size:.85rem;font-weight:700;color:var(--ink-soft);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
+input[type=text],select{width:100%;min-height:46px;font:inherit;font-size:16px;color:var(--ink);background:#fff;border:1px solid #b9b4a6;border-radius:var(--radius);padding:8px 10px}
+input:focus,select:focus,button:focus,a:focus{outline:3px solid #9fb6d6;outline-offset:1px}
+.row2{display:flex;gap:8px}.row2>*{flex:1;min-width:0}
+fieldset{border:0;padding:0;margin:0;min-width:0}
+legend{font-size:.85rem;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;padding:0}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg label{margin:0;text-transform:none;letter-spacing:0;font-weight:400;font-size:.95rem;color:var(--ink);border:1px solid #b9b4a6;border-radius:999px;padding:10px 14px;min-height:44px;display:flex;align-items:center;gap:6px;background:#fff;cursor:pointer}
+.seg input{accent-color:var(--navy);width:18px;height:18px;margin:0}
+.seg label:has(input:checked){border-color:var(--navy);background:var(--navy-soft);font-weight:700}
+.hint{font-size:.85rem;color:var(--ink-soft);margin:4px 0 0}
+.btn{font:inherit;font-size:1rem;min-height:46px;padding:10px 18px;border-radius:var(--radius);border:1px solid var(--navy);background:var(--navy);color:#fff;cursor:pointer;font-weight:700}
+.btn.alt{background:#fff;color:var(--navy)}
+.btn.red{background:var(--crimson);border-color:var(--crimson)}
+.btn.small{min-height:44px;padding:8px 12px;font-size:.9rem}
+.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.err{color:var(--crimson);font-weight:700;font-size:.9rem;min-height:1em}
+/* summary */
+.summary{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:6px 0 14px}
+@media(min-width:760px){.summary{grid-template-columns:repeat(4,1fr)}}
+.stat{border:1px solid var(--rule);border-radius:var(--radius);padding:10px 12px;background:#fff}
+.stat b{display:block;font-family:var(--head);font-size:1.6rem;color:var(--navy);line-height:1.1}
+.stat span{font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft)}
+.stat.x b{color:var(--crimson)} .stat.s b{color:var(--mustard)}
+/* log table */
+table.log{width:100%;border-collapse:collapse;font-size:.95rem}
+table.log th{font-family:var(--body);text-align:left;font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);border-bottom:2px solid var(--navy);padding:8px 6px}
+table.log td{border-bottom:1px solid var(--rule-blue);padding:10px 6px;vertical-align:middle}
+table.log tr.st-expired td:first-child{box-shadow:inset 4px 0 0 var(--crimson)}
+table.log tr.st-soon td:first-child{box-shadow:inset 4px 0 0 var(--mustard)}
+table.log tr.st-ok td:first-child{box-shadow:inset 4px 0 0 var(--navy)}
+table.log tr.st-unknown td:first-child{box-shadow:inset 4px 0 0 var(--crimson)}
+.room{font-weight:700}
+.badge{display:inline-block;padding:3px 9px;border-radius:3px;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.b-ok{background:var(--ok-soft);color:var(--ok)}
+.b-soon{background:var(--mustard-soft);color:var(--mustard)}
+.b-expired,.b-unknown{background:var(--crimson-soft);color:var(--crimson)}
+.rowbtns{display:flex;gap:6px;flex-wrap:wrap}
+.rowbtns button,.rowbtns a{font:inherit;font-size:.85rem;min-height:44px;min-width:44px;padding:6px 10px;border:1px solid #b9b4a6;background:#fff;border-radius:var(--radius);color:var(--navy);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center}
+@media(min-width:760px){table.log td.room{min-width:120px}.rowbtns{flex-wrap:nowrap}table.log td.nw{white-space:nowrap}}
+#table-wrap{max-width:100%;overflow-x:auto}
+.empty{padding:18px;border:2px dashed var(--rule);text-align:center;color:var(--ink-soft);border-radius:var(--radius)}
+@media(max-width:759px){
+  table.log thead{display:none}
+  table.log,table.log tbody,table.log tr,table.log td{display:block;width:100%}
+  table.log tr{border:1px solid var(--rule);border-radius:var(--radius);margin-bottom:10px;background:#fff;padding:6px 10px 10px 14px;position:relative}
+  table.log tr.st-expired,table.log tr.st-unknown{border-left:5px solid var(--crimson)}
+  table.log tr.st-soon{border-left:5px solid var(--mustard)}
+  table.log tr.st-ok{border-left:5px solid var(--navy)}
+  table.log td{border:0;padding:4px 0;display:flex;justify-content:space-between;gap:10px}
+  table.log td:first-child{box-shadow:none!important}
+  table.log td::before{content:attr(data-l);font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);flex:0 0 auto;padding-top:2px}
+  table.log td.room{font-size:1.1rem;font-family:var(--head)}
+  table.log td.room::before{display:none}
+  table.log td.rb{justify-content:flex-start}
+  table.log td.rb::before{display:none}
+}
+/* guide */
+.guide{display:grid;gap:14px}
+@media(min-width:760px){.guide{grid-template-columns:1fr 1fr}}
+.note{background:var(--navy-soft);border-left:4px solid var(--navy);padding:10px 12px;border-radius:0 var(--radius) var(--radius) 0;font-size:.95rem}
+.note.red{background:var(--crimson-soft);border-left-color:var(--crimson)}
+ul.tight{padding-left:1.2rem;margin:.3rem 0}
+ul.tight li{margin:.25rem 0}
+.rules{width:100%;border-collapse:collapse;font-size:.95rem}
+.rules td,.rules th{border-bottom:1px solid var(--rule);padding:8px 6px;text-align:left;vertical-align:top}
+.rules th{font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft)}
+.shop{display:grid;gap:10px}
+@media(min-width:760px){.shop{grid-template-columns:repeat(3,1fr)}}
+.shop a{display:block;border:1px solid var(--rule);border-top:4px solid var(--navy);background:#fff;padding:12px 14px;text-decoration:none;color:var(--ink);border-radius:var(--radius);min-height:44px}
+.shop a b{font-family:var(--head);color:var(--navy);font-size:1.05rem;display:block}
+.shop a span{font-size:.88rem;color:var(--ink-soft)}
+.checks label{text-transform:none;letter-spacing:0;font-weight:400;font-size:.95rem;color:var(--ink);display:flex;gap:8px;align-items:center;min-height:44px}
+.checks input{width:20px;height:20px;accent-color:var(--navy)}
+footer{border-top:3px double var(--navy);margin-top:24px;padding:18px 0 40px;font-size:.88rem;color:var(--ink-soft)}
+footer p{margin:.3rem 0}
+.sources li{word-break:break-word}
+.print-only{display:none}
+/* PRINT */
+@media print{
+  @page{margin:14mm}
+  body{background:#fff;font-size:11pt;color:#000}
+  .masthead,.tabs,.no-print,form.entry,.rowbtns,.shop-sheet,#where,#remind,.disclosure,footer .no-print{display:none!important}
+  .print-only{display:block}
+  .sheet{border:0;box-shadow:none;padding:0;margin:0}
+  .sheet::before,.sheet::after{display:none}
+  table.log thead{display:table-header-group}
+  table.log{display:table}table.log tbody{display:table-row-group}
+  table.log tr{display:table-row;border:0;padding:0;margin:0;break-inside:avoid}
+  table.log td{display:table-cell;border-bottom:1px solid #999;padding:6px 4px}
+  table.log td::before{display:none}
+  table.log td.rb{display:none}
+  table.log th.rb{display:none}
+  .badge{border:1px solid #000;background:#fff!important;color:#000!important}
+  .testlog{width:100%;border-collapse:collapse;margin-top:10px;font-size:9pt}
+  .testlog td,.testlog th{border:1px solid #777;padding:6px 3px;text-align:center}
+  .testlog td:first-child,.testlog th:first-child{text-align:left;width:26%}
+  a{color:#000;text-decoration:none}
+}
+</style>
+</head>
+<body>
+<header class="masthead">
+  <div class="wrap">
+    <div class="brandline">Household Safety Log</div>
+    <h1>Smoke &amp; CO Alarm Expiry Planner</h1>
+    <p>Log every smoke, carbon monoxide, and combination alarm in your house. Read the date off the back, see each replace-by date, print the sheet for the fridge, and drop reminders into your calendar.</p>
+    <nav class="tabs" aria-label="Sections">
+      <a href="#log">Alarm log</a><a href="#where">Where's the date?</a><a href="#remind">Reminders</a><a href="#replace">Replacements</a><a href="#sources">Sources</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="disclosure"><strong>Disclosure:</strong> As an Amazon Associate I earn from qualifying purchases. Replacement links below are Amazon search links; this page shows no prices or ratings.</p>
+
+  <section class="sheet" id="log" aria-labelledby="log-h">
+    <div class="sheet-label">Section 1 · Inventory</div>
+    <h2 id="log-h">Your house, alarm by alarm</h2>
+    <div class="print-only">
+      <p><strong>Household:</strong> <span id="p-house"></span> &nbsp;·&nbsp; <strong>Printed:</strong> <span id="p-date"></span></p>
+      <p>Replace-by dates are planning estimates. The date or instruction printed on each alarm's own label always wins.</p>
+    </div>
+    <p class="no-print">Take each alarm down (or use a phone camera), find the date on the back, and add one row per alarm. Your list stays in this browser only (saved with localStorage) — nothing is uploaded.</p>
+
+    <form class="entry no-print" id="entry" autocomplete="off" novalidate>
+      <div class="f-room">
+        <label for="room">Room / location</label>
+        <input type="text" id="room" maxlength="60" placeholder="e.g. Hallway outside bedrooms" list="room-list">
+        <datalist id="room-list"><option value="Primary bedroom"><option value="Kids' bedroom"><option value="Guest bedroom"><option value="Upstairs hallway"><option value="Downstairs hallway"><option value="Living room"><option value="Kitchen area"><option value="Basement"><option value="Garage entry"><option value="Furnace / utility room"></datalist>
+      </div>
+      <div class="f-type">
+        <label for="type">Alarm type</label>
+        <select id="type">
+          <option value="smoke">Smoke only</option>
+          <option value="co">Carbon monoxide (CO) only</option>
+          <option value="combo">Combination smoke + CO</option>
+        </select>
+      </div>
+      <div class="f-brand">
+        <label for="brand">Brand</label>
+        <select id="brand">
+          <option value="Kidde">Kidde</option>
+          <option value="First Alert">First Alert</option>
+          <option value="Other">Other brand</option>
+          <option value="Unknown">Unknown</option>
+        </select>
+      </div>
+      <fieldset class="f-mode">
+        <legend>What does the back of the alarm show?</legend>
+        <div class="seg">
+          <label><input type="radio" name="mode" value="mfg" checked> A manufacture date</label>
+          <label><input type="radio" name="mode" value="rb"> A "replace by" date</label>
+          <label><input type="radio" name="mode" value="none"> No readable date</label>
+        </div>
+      </fieldset>
+      <div class="f-date" id="date-box">
+        <label id="date-label" for="year">Manufacture date</label>
+        <div class="row2">
+          <select id="month" aria-label="Month"></select>
+          <select id="year" aria-label="Year"></select>
+        </div>
+        <p class="hint" id="date-hint">If you only know the year, leave month as "Month?" — we'll assume January (the earlier, safer guess).</p>
+      </div>
+      <div class="f-life" id="life-box">
+        <label for="life">Service life (years)</label>
+        <select id="life">
+          <option value="5">5 years</option>
+          <option value="7">7 years</option>
+          <option value="10" selected>10 years</option>
+        </select>
+        <p class="hint" id="life-hint">Smoke and combo default to 10 years. If the label says something different, the label wins.</p>
+      </div>
+      <div class="f-actions">
+        <div class="actions">
+          <button type="submit" class="btn" id="add-btn">Add alarm to log</button>
+          <button type="button" class="btn alt" id="cancel-edit" hidden>Cancel edit</button>
+          <span class="err" id="err" role="alert"></span>
+        </div>
+      </div>
+    </form>
+
+    <div class="summary" id="summary" aria-live="polite"></div>
+    <div id="table-wrap"></div>
+
+    <div class="actions no-print" style="margin-top:12px">
+      <button type="button" class="btn alt" id="print-btn">Print household sheet</button>
+      <button type="button" class="btn alt" id="ics-btn2">Download reminders (.ics)</button>
+      <button type="button" class="btn alt small" id="sample-btn">Load an example house</button>
+      <button type="button" class="btn alt small" id="clear-btn">Clear log</button>
+    </div>
+    <p class="no-print hint" style="margin-top:10px"><label for="house" style="display:inline;text-transform:none;letter-spacing:0">Household name for the printout:</label></p>
+    <input class="no-print" type="text" id="house" maxlength="60" placeholder="e.g. 12 Maple St" style="max-width:360px">
+
+    <div class="print-only">
+      <h3 style="margin-top:16px">Monthly test log</h3>
+      <p>Press each alarm's test button once a month (NFPA guidance) and tick the box.</p>
+      <table class="testlog" id="testlog"></table>
+    </div>
+  </section>
+
+  <section class="sheet" id="where" aria-labelledby="where-h">
+    <div class="sheet-label">Section 2 · Field guide</div>
+    <h2 id="where-h">Where is the date on my alarm?</h2>
+    <div class="guide">
+      <div>
+        <ul class="tight">
+          <li><strong>Turn the alarm over.</strong> Twist it off its mounting plate and look at the label on the back. Kidde says the manufacture date code is stamped on that label, near the model number. First Alert likewise says to look at the back of the alarm for the date of manufacture.</li>
+          <li><strong>It's a manufacture date, not an expiration date.</strong> First Alert's FAQ notes the date printed on the back is the date the unit was made.</li>
+          <li><strong>Count from manufacture, not from when you installed it.</strong> NFPA states smoke alarms must be replaced 10 years after their manufacturing date. An alarm that sat on a shelf for two years has two fewer years left.</li>
+          <li><strong>If the label prints a "replace by" date,</strong> choose that option above and enter it as-is. That printed date beats any rule of thumb here.</li>
+          <li><strong>No date, or can't read it?</strong> Kidde advises replacing the alarm if there's any doubt about its age. Log it as "No readable date" and it will be flagged.</li>
+        </ul>
+      </div>
+      <div>
+        <table class="rules">
+          <thead><tr><th>Alarm type</th><th>Typical replacement (estimate)</th><th>Source</th></tr></thead>
+          <tbody>
+            <tr><td>Smoke (and heat)</td><td>10 years from manufacture</td><td>NFPA; Kidde; First Alert</td></tr>
+            <tr><td>Carbon monoxide</td><td>5–7 years (First Alert) or 7–10 years (Kidde), depending on model</td><td>First Alert; Kidde</td></tr>
+            <tr><td>Combination smoke + CO</td><td>7–10 years depending on model (Kidde). This tool defaults to 10 — set 7 if your label says so.</td><td>Kidde</td></tr>
+          </tbody>
+        </table>
+        <p class="note red" style="margin-top:12px"><strong>The label always wins.</strong> These are general rules of thumb. We don't decode brand date-code ciphers — if your alarm uses a code you can't read, check its user manual or contact the manufacturer.</p>
+        <p class="note">An alarm that chirps even after a fresh battery may be signalling end of life — NFPA says the unit then needs replacing.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet" id="remind" aria-labelledby="remind-h">
+    <div class="sheet-label">Section 3 · Calendar</div>
+    <h2 id="remind-h">Put the replace-by dates in your calendar</h2>
+    <p>Generates a standard <code>.ics</code> file right in your browser (nothing is sent anywhere). Open it with Google Calendar, Apple Calendar, or Outlook.</p>
+    <div class="checks">
+      <label><input type="checkbox" id="ics-per" checked> One all-day event per alarm on its replace-by date (overdue or undated alarms get an event for tomorrow)</label>
+      <label><input type="checkbox" id="ics-year" checked> A yearly "check every alarm's date" reminder</label>
+      <label><input type="checkbox" id="ics-month"> A monthly "press the test button" reminder</label>
+    </div>
+    <div class="actions" style="margin-top:8px"><button type="button" class="btn" id="ics-btn">Download .ics reminders</button><span class="err" id="ics-err" role="alert"></span></div>
+  </section>
+
+  <section class="sheet shop-sheet" id="replace" aria-labelledby="replace-h">
+    <div class="sheet-label">Section 4 · Replacements</div>
+    <h2 id="replace-h">Shopping for replacements</h2>
+    <p>Search links open Amazon. Match what you're replacing (smoke vs. CO vs. combo, battery vs. hardwired, and interconnect brand if your alarms are linked). Check the new unit's own label for its service life.</p>
+    <div class="shop">
+      <a href="https://www.amazon.com/s?k=10+year+sealed+smoke+detector&amp;tag=wellpumpplann-20" target="_blank" rel="sponsored nofollow noopener"><b>10-year sealed smoke alarms</b><span>Built-in battery, no battery swaps for the life of the unit.</span></a>
+      <a href="https://www.amazon.com/s?k=combination+smoke+carbon+monoxide+alarm&amp;tag=wellpumpplann-20" target="_blank" rel="sponsored nofollow noopener"><b>Combination smoke + CO alarms</b><span>One unit covering both — common outside bedrooms.</span></a>
+      <a href="https://www.amazon.com/s?k=carbon+monoxide+detector&amp;tag=wellpumpplann-20" target="_blank" rel="sponsored nofollow noopener"><b>Carbon monoxide detectors</b><span>Plug-in, battery, and hardwired CO alarms.</span></a>
+      <a href="https://www.amazon.com/s?k=hardwired+smoke+detector+battery+backup&amp;tag=wellpumpplann-20" target="_blank" rel="sponsored nofollow noopener"><b>Hardwired smoke alarms</b><span>Replacing a wired unit? Check connector compatibility first.</span></a>
+      <a href="https://www.amazon.com/s?k=photoelectric+smoke+alarm&amp;tag=wellpumpplann-20" target="_blank" rel="sponsored nofollow noopener"><b>Photoelectric smoke alarms</b><span>NFPA notes these suit areas near kitchens and bathrooms.</span></a>
+      <a href="https://www.amazon.com/s?k=smoke+detector+mounting+bracket+replacement&amp;tag=wellpumpplann-20" target="_blank" rel="sponsored nofollow noopener"><b>Mounting plates &amp; adapters</b><span>For swapping brands without patching the ceiling.</span></a>
+    </div>
+  </section>
+
+  <section class="sheet" id="sources" aria-labelledby="src-h">
+    <div class="sheet-label">Section 5 · References</div>
+    <h2 id="src-h">Sources</h2>
+    <ul class="tight sources">
+      <li>First Alert — <a href="https://support.firstalert.com/s/article/Are-my-smoke-alarms-still-good" rel="noopener" target="_blank">How do I know if I should replace my current smoke and/or CO alarms?</a> (look at the back for the date of manufacture; smoke and heat alarms replaced 10 years from manufacture; CO and gas alarms after 5–7 years depending on model)</li>
+      <li>First Alert — <a href="https://support.firstalert.com/s/article/Smoke-or-CO-Alarm-Expiration-Dates" rel="noopener" target="_blank">Smoke or CO Alarm Expiration Dates: FAQ</a> (the printed date is the manufacture date, not an expiration date; replace alarms over 10 years old)</li>
+      <li>Kidde — <a href="https://www.kidde.com/support/smoke-alarms/alarms-replacement-time" rel="noopener" target="_blank">When Should I Replace My Alarms?</a> (smoke and heat every 10 years per NFPA; CO and combination every 7–10 years depending on model; replace if in doubt)</li>
+      <li>Kidde — <a href="https://www.kidde.com/support/smoke-alarms/manufacture-date-location" rel="noopener" target="_blank">How to Find the Date of Manufacture on an Alarm</a> (date code stamped on the label on the back)</li>
+      <li>NFPA — <a href="https://www.nfpa.org/education-and-research/home-fire-safety/smoke-alarms" rel="noopener" target="_blank">Smoke Alarm Information</a> (test monthly; replace smoke alarms 10 years after the manufacturing date)</li>
+    </ul>
+    <p class="hint">Sources checked November 2026.</p>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p><strong>Planning tool only — not fire or life-safety advice.</strong> Replace-by dates here are estimates built from general manufacturer and NFPA guidance. Always follow the instructions and dates printed on your alarm's own label and in its manual, and follow your local code and fire authority.</p>
+    <p>Test every alarm monthly with its test button. Replace any alarm that fails its test, keeps chirping after a fresh battery, or whose age you can't confirm.</p>
+    <p>As an Amazon Associate I earn from qualifying purchases. Brand names are trademarks of their owners; this site is not affiliated with Kidde, First Alert, or NFPA.</p>
+    <p>Your alarm list is stored only in this browser's localStorage.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+'use strict';
+var KEY='bank-smoke-co-log-v1', HKEY='bank-smoke-co-house-v1', TAG='wellpumpplann-20';
+var MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var TYPE_LABEL={smoke:'Smoke',co:'CO',combo:'Smoke + CO'};
+var DEFAULT_LIFE={smoke:10,co:7,combo:10};
+var $=function(id){return document.getElementById(id)};
+
+/* ---------- pure date math (exported for tests) ---------- */
+function mIndex(y,m){return y*12+(m-1)}              // m: 1-12
+function fromIndex(i){return {y:Math.floor(i/12),m:(i%12)+1}}
+function replaceBy(a){ // returns {y,m} or null
+  if(a.mode==='rb') return {y:a.y,m:a.m||1};
+  if(a.mode==='mfg') return {y:a.y+Number(a.life),m:a.m||1};
+  return null;
+}
+function status(a,today){ // today: {y,m}
+  var rb=replaceBy(a); if(!rb) return 'unknown';
+  var d=mIndex(rb.y,rb.m)-mIndex(today.y,today.m);
+  if(d<=0) return 'expired';          // replace-by month reached or passed
+  if(d<=12) return 'soon';            // within next 12 months
+  return 'ok';
+}
+function fmt(ym,monthKnown){return ym?((monthKnown===false?'':MONTHS[ym.m-1]+' ')+ym.y):'—'}
+var STATUS_TXT={ok:'OK',soon:'Replace within 12 mo',expired:'Expired',unknown:'Unknown age'};
+
+/* ---------- ICS ---------- */
+function icsEsc(s){return String(s).replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n')}
+function u8len(ch){var c=ch.codePointAt(0);return c<0x80?1:c<0x800?2:c<0x10000?3:4}
+function fold(line){ // RFC 5545: max 75 octets per line
+  var out=[],cur='',n=0,chars=Array.from(line),lim=75;
+  for(var i=0;i<chars.length;i++){var b=u8len(chars[i]);if(n+b>lim){out.push(cur);cur=' ';n=1;lim=75}cur+=chars[i];n+=b}
+  out.push(cur);return out.join('\r\n')}
+function pad(n){return (n<10?'0':'')+n}
+function ymd(d){return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())}
+function buildICS(list,opts,now){
+  now=now||new Date();
+  var stamp=now.getUTCFullYear()+pad(now.getUTCMonth()+1)+pad(now.getUTCDate())+'T'+pad(now.getUTCHours())+pad(now.getUTCMinutes())+pad(now.getUTCSeconds())+'Z';
+  var tomorrow=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);
+  var today={y:now.getFullYear(),m:now.getMonth()+1};
+  var L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//BANK//Smoke CO Alarm Planner//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH','X-WR-CALNAME:Smoke & CO alarm reminders'];
+  var n=0;
+  function ev(uid,start,summary,desc,rrule){
+    var end=new Date(start.getFullYear(),start.getMonth(),start.getDate()+1);
+    L.push('BEGIN:VEVENT','UID:'+uid+'@smoke-co-alarm-planner.vercel.app','DTSTAMP:'+stamp,'DTSTART;VALUE=DATE:'+ymd(start),'DTEND;VALUE=DATE:'+ymd(end));
+    if(rrule) L.push(rrule);
+    L.push('SUMMARY:'+icsEsc(summary),'DESCRIPTION:'+icsEsc(desc),'TRANSP:TRANSPARENT',
+      'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+icsEsc(summary),'TRIGGER:-PT15H','END:VALARM','END:VEVENT');
+    n++;
+  }
+  if(opts.per){
+    list.forEach(function(a){
+      var rb=replaceBy(a), st=status(a,today), start;
+      if(!rb||st==='expired') start=tomorrow; else start=new Date(rb.y,rb.m-1,1);
+      var what=TYPE_LABEL[a.type]+' alarm — '+a.room;
+      var summary=(st==='expired'?'OVERDUE: replace ':st==='unknown'?'Check/replace undated ':'Replace ')+what;
+      var desc=(a.brand?a.brand+' ':'')+TYPE_LABEL[a.type]+' alarm in '+a.room+'. '+(rb?'Estimated replace-by: '+fmt(rb)+'. ':'No readable date on the unit. ')+'The date or instructions on the alarm label always win. https://smoke-co-alarm-planner.vercel.app/';
+      ev('alarm-'+a.id,start,summary,desc,null);
+    });
+  }
+  if(opts.year){
+    ev('yearly-check-'+ymd(now),tomorrow,'Check the dates on every smoke & CO alarm','Yearly check: read the date on the back of each alarm and update your log. https://smoke-co-alarm-planner.vercel.app/','RRULE:FREQ=YEARLY');
+  }
+  if(opts.month){
+    ev('monthly-test-'+ymd(now),tomorrow,'Test smoke & CO alarms','Press the test button on every alarm (NFPA: test monthly).','RRULE:FREQ=MONTHLY');
+  }
+  L.push('END:VCALENDAR');
+  return {text:L.map(fold).join('\r\n')+'\r\n',count:n};
+}
+
+if(typeof module!=='undefined'&&typeof document==='undefined'){module.exports={replaceBy:replaceBy,status:status,buildICS:buildICS,mIndex:mIndex};return}
+
+/* ---------- state ---------- */
+var list=[];
+try{list=JSON.parse(localStorage.getItem(KEY)||'[]');if(!Array.isArray(list))list=[]}catch(e){list=[]}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(list))}catch(e){}}
+var editing=null;
+var now=new Date(), TODAY={y:now.getFullYear(),m:now.getMonth()+1};
+
+/* ---------- form setup ---------- */
+var monthSel=$('month'), yearSel=$('year');
+function fillYears(mode){
+  var cur=yearSel.value, lo,hi;
+  if(mode==='rb'){lo=TODAY.y-15;hi=TODAY.y+12}else{lo=TODAY.y-30;hi=TODAY.y}
+  var h='<option value="">Year</option>';
+  for(var y=hi;y>=lo;y--)h+='<option value="'+y+'">'+y+'</option>';
+  yearSel.innerHTML=h; if(cur&&+cur>=lo&&+cur<=hi)yearSel.value=cur;
+}
+monthSel.innerHTML='<option value="">Month?</option>'+MONTHS.map(function(m,i){return '<option value="'+(i+1)+'">'+m+'</option>'}).join('');
+fillYears('mfg');
+function mode(){var r=document.querySelector('input[name=mode]:checked');return r?r.value:'mfg'}
+function syncMode(){
+  var m=mode();
+  $('date-box').hidden=(m==='none');
+  $('life-box').hidden=(m!=='mfg');
+  $('date-label').textContent=m==='rb'?'Replace-by date printed on label':'Manufacture date';
+  $('date-hint').textContent=m==='rb'?'Enter the replace-by date exactly as printed. No month shown? Leave "Month?" and we\'ll use January.':'If you only know the year, leave month as "Month?" — we\'ll assume January (the earlier, safer guess).';
+  fillYears(m==='rb'?'rb':'mfg');
+}
+function syncType(){
+  var t=$('type').value;
+  $('life').value=String(DEFAULT_LIFE[t]);
+  $('life-hint').textContent=t==='co'
+    ? 'CO life varies by model: First Alert says 5–7 years, Kidde says 7–10. Default 7 — pick what your label states. The label wins.'
+    : t==='combo' ? 'Kidde lists combination alarms at 7–10 years depending on model. Default 10 — set 7 if your label says so.'
+    : 'Smoke alarms: 10 years from manufacture (NFPA, Kidde, First Alert). If the label says otherwise, the label wins.';
+}
+document.querySelectorAll('input[name=mode]').forEach(function(r){r.addEventListener('change',syncMode)});
+$('type').addEventListener('change',syncType);
+syncType();
+
+$('entry').addEventListener('submit',function(e){
+  e.preventDefault();
+  var room=$('room').value.trim(), m=mode(), err=$('err');
+  err.textContent='';
+  if(!room){err.textContent='Add a room or location name.';$('room').focus();return}
+  var a={id:editing||(Date.now().toString(36)+Math.random().toString(36).slice(2,6)),room:room,type:$('type').value,brand:$('brand').value,mode:m};
+  if(m!=='none'){
+    if(!yearSel.value){err.textContent='Pick the year from the label (or choose "No readable date").';yearSel.focus();return}
+    a.y=+yearSel.value; a.m=monthSel.value?+monthSel.value:0;
+  }
+  if(m==='mfg') a.life=+$('life').value;
+  if(editing){list=list.map(function(x){return x.id===editing?a:x})}else list.push(a);
+  editing=null; $('add-btn').textContent='Add alarm to log'; $('cancel-edit').hidden=true;
+  save(); render();
+  $('room').value=''; monthSel.value=''; yearSel.value='';
+  $('room').focus();
+});
+$('cancel-edit').addEventListener('click',function(){editing=null;$('add-btn').textContent='Add alarm to log';this.hidden=true;$('entry').reset();syncMode();syncType()});
+
+/* ---------- render ---------- */
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function shopQuery(t){return t==='co'?'carbon monoxide detector':t==='combo'?'combination smoke carbon monoxide alarm':'10 year sealed smoke detector'}
+function amz(q){return 'https://www.amazon.com/s?k='+encodeURIComponent(q).replace(/%20/g,'+')+'&tag='+TAG}
+var ORDER={expired:0,unknown:1,soon:2,ok:3};
+function render(){
+  var rows=list.map(function(a){return {a:a,st:status(a,TODAY),rb:replaceBy(a)}});
+  rows.sort(function(p,q){return ORDER[p.st]-ORDER[q.st]||((p.rb?mIndex(p.rb.y,p.rb.m):0)-(q.rb?mIndex(q.rb.y,q.rb.m):0))});
+  var c={ok:0,soon:0,expired:0,unknown:0}; rows.forEach(function(r){c[r.st]++});
+  var next=rows.filter(function(r){return r.st==='ok'||r.st==='soon'})[0];
+  $('summary').innerHTML=list.length?
+    '<div class="stat"><b>'+list.length+'</b><span>Alarms logged</span></div>'+
+    '<div class="stat x"><b>'+(c.expired+c.unknown)+'</b><span>Replace now</span></div>'+
+    '<div class="stat s"><b>'+c.soon+'</b><span>Replace within 12 mo</span></div>'+
+    '<div class="stat"><b style="font-size:1.15rem">'+(next?esc(fmt(next.rb,next.a.m!==0)):'—')+'</b><span>Next replace-by</span></div>':'';
+  if(!list.length){$('table-wrap').innerHTML='<div class="empty">No alarms logged yet. Add your first one above — or tap "Load an example house" to see how it works.</div>';renderTestLog();return}
+  var h='<table class="log"><thead><tr><th>Room</th><th>Type</th><th>Brand</th><th>Manufactured</th><th>Life</th><th>Replace by</th><th>Status</th><th class="rb no-print"><span class="no-print">Actions</span></th></tr></thead><tbody>';
+  rows.forEach(function(r){
+    var a=r.a, known=a.m!==0;
+    var mfgTxt=a.mode==='mfg'?fmt({y:a.y,m:a.m||1},known):a.mode==='rb'?'See label':'No readable date';
+    var lifeTxt=a.mode==='mfg'?a.life+' yr':a.mode==='rb'?'label':'—';
+    var rbTxt=r.rb?fmt(r.rb,known):'Unknown';
+    h+='<tr class="st-'+r.st+'"><td class="room" data-l="Room">'+esc(a.room)+'</td><td data-l="Type">'+TYPE_LABEL[a.type]+'</td><td data-l="Brand">'+esc(a.brand)+'</td><td data-l="Manufactured">'+mfgTxt+'</td><td class="nw" data-l="Life">'+lifeTxt+'</td><td class="nw" data-l="Replace by"><strong>'+rbTxt+'</strong></td><td data-l="Status"><span class="badge b-'+r.st+'">'+STATUS_TXT[r.st]+'</span></td>'+
+      '<td class="rb" data-l=""><div class="rowbtns">'+(r.st!=='ok'?'<a href="'+amz(shopQuery(a.type))+'" target="_blank" rel="sponsored nofollow noopener" aria-label="Shop replacement for '+esc(a.room)+'">Shop</a>':'')+'<button type="button" data-edit="'+a.id+'" aria-label="Edit '+esc(a.room)+'">Edit</button><button type="button" data-del="'+a.id+'" aria-label="Remove '+esc(a.room)+'">Remove</button></div></td></tr>';
+  });
+  h+='</tbody></table><p class="hint">Status: <strong>Expired</strong> = replace-by month reached or passed. <strong>Replace within 12 mo</strong> = due in the next 12 months. Dates are estimates; the label wins.</p>';
+  $('table-wrap').innerHTML=h;
+  renderTestLog();
+}
+function renderTestLog(){
+  var h='<tr><th>Alarm</th>';
+  for(var i=0;i<12;i++){var d=fromIndex(mIndex(TODAY.y,TODAY.m)+i);h+='<th>'+MONTHS[d.m-1]+'</th>'}
+  h+='</tr>';
+  (list.length?list:[{room:'',type:'smoke'},{room:'',type:'smoke'},{room:'',type:'smoke'}]).forEach(function(a){
+    h+='<tr><td>'+esc(a.room)+(a.room?' ('+TYPE_LABEL[a.type]+')':'&nbsp;')+'</td>'+'<td>&#9744;</td>'.repeat(12)+'</tr>';
+  });
+  $('testlog').innerHTML=h;
+}
+$('table-wrap').addEventListener('click',function(e){
+  var t=e.target, id;
+  if((id=t.getAttribute('data-del'))){
+    var a=list.filter(function(x){return x.id===id})[0];
+    if(a&&confirm('Remove "'+a.room+'" from the log?')){list=list.filter(function(x){return x.id!==id});save();render()}
+  } else if((id=t.getAttribute('data-edit'))){
+    var b=list.filter(function(x){return x.id===id})[0]; if(!b)return;
+    editing=id; $('room').value=b.room; $('type').value=b.type; syncType(); $('brand').value=b.brand;
+    document.querySelector('input[name=mode][value="'+b.mode+'"]').checked=true; syncMode();
+    if(b.mode!=='none'){yearSel.value=String(b.y);monthSel.value=b.m?String(b.m):''}
+    if(b.mode==='mfg')$('life').value=String(b.life);
+    $('add-btn').textContent='Save changes'; $('cancel-edit').hidden=false;
+    $('entry').scrollIntoView({behavior:'smooth',block:'start'}); $('room').focus({preventScroll:true});
+  }
+});
+
+/* ---------- buttons ---------- */
+var house=$('house');
+house.value=localStorage.getItem(HKEY)||'';
+house.addEventListener('input',function(){try{localStorage.setItem(HKEY,house.value)}catch(e){}});
+$('print-btn').addEventListener('click',function(){
+  $('p-house').textContent=house.value||'—';
+  $('p-date').textContent=new Date().toLocaleDateString();
+  window.print();
+});
+window.addEventListener('beforeprint',function(){$('p-house').textContent=house.value||'—';$('p-date').textContent=new Date().toLocaleDateString()});
+function downloadICS(){
+  var err=$('ics-err'); err.textContent='';
+  var opts={per:$('ics-per').checked,year:$('ics-year').checked,month:$('ics-month').checked};
+  if(opts.per&&!list.length&&!opts.year&&!opts.month){err.textContent='Add at least one alarm first.';return}
+  var r=buildICS(opts.per?list:[],opts);
+  if(!r.count){err.textContent='Nothing selected to export.';return}
+  var blob=new Blob([r.text],{type:'text/calendar;charset=utf-8'});
+  var url=URL.createObjectURL(blob), a=document.createElement('a');
+  a.href=url; a.download='smoke-co-alarm-reminders.ics'; document.body.appendChild(a); a.click();
+  setTimeout(function(){URL.revokeObjectURL(url);a.remove()},1500);
+  err.style.color='var(--navy)'; err.textContent=r.count+' event'+(r.count>1?'s':'')+' saved to your downloads.';
+  setTimeout(function(){err.style.color=''},4000);
+}
+$('ics-btn').addEventListener('click',downloadICS);
+$('ics-btn2').addEventListener('click',function(){$('ics-per').checked=true;downloadICS()});
+$('sample-btn').addEventListener('click',function(){
+  if(list.length&&!confirm('Add example alarms to your existing log?'))return;
+  var y=TODAY.y;
+  list=list.concat([
+    {id:'ex1'+Date.now().toString(36),room:'Upstairs hallway',type:'smoke',brand:'Kidde',mode:'mfg',y:y-11,m:3,life:10},
+    {id:'ex2'+Date.now().toString(36),room:'Primary bedroom',type:'combo',brand:'First Alert',mode:'mfg',y:y-9,m:TODAY.m,life:10},
+    {id:'ex3'+Date.now().toString(36),room:'Basement near furnace',type:'co',brand:'Other',mode:'mfg',y:y-2,m:6,life:7},
+    {id:'ex4'+Date.now().toString(36),room:'Garage entry',type:'co',brand:'Kidde',mode:'rb',y:y+4,m:9},
+    {id:'ex5'+Date.now().toString(36),room:'Guest bedroom',type:'smoke',brand:'Unknown',mode:'none'}
+  ]);
+  save(); render();
+});
+$('clear-btn').addEventListener('click',function(){if(list.length&&confirm('Clear every alarm from this log? This cannot be undone.')){list=[];save();render()}});
+
+syncMode(); render();
+})();
+</script>
+</body>
+</html>
